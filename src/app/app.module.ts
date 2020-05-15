@@ -8,9 +8,10 @@ import { GroupPageComponent } from './group-page/group-page/group-page.component
 import { GroupCardComponent } from './group-page/group-card/group-card.component';
 import { MembersPageComponent } from './members-page/members-page/members-page.component';
 import {AngularFireModule} from '@angular/fire';
-import {environment} from '../environments/environment';
+
 import {AngularFireStorage} from '@angular/fire/storage';
 import { MembersListComponent } from './members-page/members-list/members-list.component';
+import {firebaseConfig} from '../environments/firebaseSecret';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,7 @@ import { MembersListComponent } from './members-page/members-list/members-list.c
     BrowserModule,
     AppRoutingModule,
     NgbModule,
-    AngularFireModule.initializeApp(environment.firebaseConfig)
+    AngularFireModule.initializeApp(firebaseConfig)
   ],
   providers: [AngularFireStorage],
   bootstrap: [AppComponent]
