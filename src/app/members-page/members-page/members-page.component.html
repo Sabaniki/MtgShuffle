@@ -1,1 +1,13 @@
-<p>members-page works!</p>
+<div class="container-fluid">
+
+  <div class="row mb-5">
+    <div class="col-md-4"></div>
+    <button class="btn btn-lg bg-white col-md-4">Grouping --></button>
+    <div class="col-md-4"></div>
+  </div>
+
+  <div class="row">
+    <app-members-list class="col-md-6" [listName]="'Seniors'"></app-members-list>
+    <app-members-list class="col-md-6" [listName]="'Juniors'"></app-members-list>
+  </div>
+</div>

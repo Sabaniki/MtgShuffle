@@ -3,7 +3,16 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  firebaseConfig: {
+    apiKey: 'AIzaSyCP_8GbwyjHEv61ei5GRl4cvBpgrVqlyuM',
+    authDomain: 'mtg-shuffle.firebaseapp.com',
+    databaseURL: 'https://mtg-shuffle.firebaseio.com',
+    projectId: 'mtg-shuffle',
+    storageBucket: 'mtg-shuffle.appspot.com',
+    messagingSenderId: '450096609037',
+    appId: '1:450096609037:web:af86c2ae9bc65032a1a244'
+  }
 };
 
 /*
