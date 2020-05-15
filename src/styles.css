@@ -1,1 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
+
+@import "~bootstrap";
+@import url('https://fonts.googleapis.com/css2?family=Electrolize&display=swap');
+
+body {
+  background: #222222;
+  color: snow;
+  font-family: 'Electrolize', sans-serif;
+}
