@@ -4,6 +4,7 @@ import {Member} from '../../shared/interfaces/member';
 import {Observable} from 'rxjs';
 import {Router} from '@angular/router';
 import {map, tap} from 'rxjs/operators';
+import {stringify} from 'querystring';
 
 @Component({
   selector: 'app-group-page',
@@ -92,14 +93,27 @@ export class GroupPageComponent implements OnInit {
             console.log(flatGroupIds);
 
 
-            for (const junior of juniors) {
-              console.log(junior.name);
-              junior.groupId = 0;
-              this.juniorsCollection.get().subscribe((ref) => ref.forEach(doc => {
-                this.juniorsCollection.doc(doc.id).update(Object.assign({}, junior));
-              }));
-              // .doc(this.juniorsCollection).update(Object.assign({}, junior));
-            }
+            // console.log(junior.name);
+            // junior.groupId = 0;
+            let index = 0;
+            const docIds = new Array<string>();
+            this.juniorsCollection.get().pipe(
+              tap((ref) => {
+                ref.forEach(doc => docIds.push(doc.id));
+              })
+            ).subscribe(_ => {
+              docIds.forEach(id => {
+                const shadowJ = juniors[index];
+                shadowJ.groupId = flatGroupIds[index];
+                this.juniorsCollection.doc(id).update(Object.assign({}, shadowJ));
+                index++;
+              });
+              index = 0;
+            });
+            // .doc(this.juniorsCollection).update(Object.assign({}, junior));
+            // (ref) => ref.forEach(doc => {
+            //                 this.juniorsCollection.doc(doc.id).update(Object.assign({}, junior));
+            //               })
           }),
         ).subscribe();
       }),
