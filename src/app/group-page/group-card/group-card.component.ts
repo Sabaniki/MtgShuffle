@@ -1,4 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
+import {AngularFirestore, AngularFirestoreCollection} from '@angular/fire/firestore';
+import {Member} from '../../shared/interfaces/member';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-group-card',
@@ -6,11 +9,18 @@ import {Component, Input, OnInit} from '@angular/core';
   styleUrls: ['./group-card.component.css']
 })
 export class GroupCardComponent implements OnInit {
-  @Input() leaderName: string;
+  // @Input() leaderName: string;
   @Input() groupId: number;
-  constructor() { }
+
+  // private membersCollection: AngularFirestoreCollection<Member>;
+  @Input() members: Observable<Member[]>;
+  @Input() leaders: Observable<Member[]>;
+
+  constructor(private afs: AngularFirestore) {
+  }
 
   ngOnInit(): void {
+
   }
 
 }

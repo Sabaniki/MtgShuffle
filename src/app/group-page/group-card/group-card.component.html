@@ -1,18 +1,11 @@
 <div class="card dark-back mb-5">
-  <h2>{{leaderName}}'s group</h2>
-<!--  <ul class="list-group">-->
-<!--    <li class="list-group-item dark-back" *ngFor="let member of (members | async)">-->
-<!--      {{member.name}}-->
-<!--      <button class="btn btn-info float-right">-</button>-->
-<!--    </li>-->
-<!--    <div>-->
-<!--      <div class="container">-->
-<!--        <div class="row">-->
-<!--          <div class="col-md-4"></div>-->
-<!--          <button class="btn bg-white col-md-4">edit member...</button>-->
-<!--          <div class="col-md-4"></div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </ul>-->
+<!--  <h2>{{listName}}</h2>-->
+  <h3>{{(leaders | async)[groupId].name}}'s group</h3>
+  <ul class="list-group">
+    <ng-container  *ngFor="let member of (members | async)">
+      <li class="list-group-item dark-back" *ngIf="member.groupId == groupId">
+        {{member.name}}
+      </li>
+    </ng-container>
+  </ul>
 </div>

@@ -1,7 +1,12 @@
 <div class="container-fluid">
   <div class="row">
     <button class="col-md-4 btn btn-lg bg-white m-2" (click)="onClickGoMembersButton()"><-- Members</button>
-    <button class="col-md-4 btn btn-lg bg-white m-2" (click)="resetGroup()">! Reset Groups !</button>
+    <button class="col-md-4 btn btn-lg bg-white m-2" (click)="resetGroup()" [disabled]="!isFirst">! Reset Groups !</button>
     <div class="col-md-4"></div>
+  </div>
+  <div class="row">
+    <ng-container *ngFor="let order of arrayNumberLength(sumOfSeniors); index as i;">
+      <app-group-card class="col-md-4" [members]="juniors" [leaders]="seniors" groupId="{{i}}"></app-group-card>
+    </ng-container>
   </div>
 </div>

@@ -1,17 +1,16 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {AngularFirestore, AngularFirestoreCollection, DocumentChangeAction} from '@angular/fire/firestore';
 import {Member} from '../../shared/interfaces/member';
 import {Observable} from 'rxjs';
 import {Router} from '@angular/router';
-import {map, tap} from 'rxjs/operators';
-import {stringify} from 'querystring';
+import {tap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-group-page',
   templateUrl: './group-page.component.html',
   styleUrls: ['./group-page.component.css']
 })
-export class GroupPageComponent implements OnInit {
+export class GroupPageComponent implements OnInit, OnDestroy {
   private seniorsCollection: AngularFirestoreCollection<Member>;
   public seniors: Observable<Member[]>;
   private seniorsSnapshot: Observable<DocumentChangeAction<Member>[]>;
@@ -20,9 +19,12 @@ export class GroupPageComponent implements OnInit {
   public juniors: Observable<Member[]>;
   private juniorsSnapshot: Observable<DocumentChangeAction<Member>[]>;
 
-  private shuffledGroupIds: number[];
+  public isFirst;
 
   @Input() listName: string;
+
+  public sumOfSeniors = 0;
+  public sumOfJuniors = 0;
 
   constructor(private afs: AngularFirestore, private router: Router) {
   }
@@ -39,39 +41,54 @@ export class GroupPageComponent implements OnInit {
     this.juniorsCollection = this.afs.collection<Member>('Juniors');
     this.juniors = this.juniorsCollection.valueChanges();
     this.juniorsSnapshot = this.juniorsCollection.snapshotChanges();
-  }
 
-  resetGroup() {
-    let sumOfSeniors = 0;
-    let sumOfJuniors = 0;
-    let flatGroupIds: number[];
-
-    // this.seniors.pipe(
-    //   tap(seniors => sumOfSeniors = seniors.length),
-    //   tap(_ => console.log('hogera'))
-    //   // map(seniors => {
-    //   //   for (const item of seniors) {
-    //   //     item.groupId = 1;
-    //   //   }
-    //   // })
-    // ).subscribe(() => console.log('seniors: ' + sumOfSeniors));
+    this.isFirst = true;
 
     this.juniors.pipe(
       tap(juniors => {
         this.seniors.pipe(
           tap(seniors => {
-            sumOfSeniors = seniors.length;
-            sumOfJuniors = juniors.length;
+            this.sumOfSeniors = seniors.length;
+            this.sumOfJuniors = juniors.length;
+          })
+        ).subscribe();
+      })
+    ).subscribe();
+  }
 
-            console.log('seniors: ' + sumOfSeniors);
-            console.log('juniors: ' + sumOfJuniors);
+  ngOnDestroy(): void {
+    this.isFirst = false;
+  }
 
-            const numberOfMemberPerGroup = Math.floor(sumOfJuniors / sumOfSeniors);
-            const remainder = sumOfJuniors % sumOfSeniors;
+  arrayNumberLength(num: number): any[] {
+    return [...Array(num)];
+  }
+
+  resetGroup() {
+    // let sumOfSeniors = 0;
+    // let sumOfJuniors = 0;
+    let flatGroupIds: number[];
+
+    this.juniors.pipe(
+      tap(juniors => {
+        if (!this.isFirst) {
+          return;
+        }
+        this.isFirst = false;
+        this.seniors.pipe(
+          tap(seniors => {
+            this.sumOfSeniors = seniors.length;
+            this.sumOfJuniors = juniors.length;
+
+            console.log('seniors: ' + this.sumOfSeniors);
+            console.log('juniors: ' + this.sumOfJuniors);
+
+            const numberOfMemberPerGroup = Math.floor(this.sumOfJuniors / this.sumOfSeniors);
+            const remainder = this.sumOfJuniors % this.sumOfSeniors;
 
             const groupsIds = new Array<Array<number>>();
 
-            for (let i = 0; i < sumOfSeniors; i++) {
+            for (let i = 0; i < this.sumOfSeniors; i++) {
               groupsIds.push(Array(numberOfMemberPerGroup).fill(i));
             }
 
@@ -92,9 +109,6 @@ export class GroupPageComponent implements OnInit {
 
             console.log(flatGroupIds);
 
-
-            // console.log(junior.name);
-            // junior.groupId = 0;
             let index = 0;
             const docIds = new Array<string>();
             this.juniorsCollection.get().pipe(
@@ -105,18 +119,16 @@ export class GroupPageComponent implements OnInit {
               docIds.forEach(id => {
                 const shadowJ = juniors[index];
                 shadowJ.groupId = flatGroupIds[index];
-                this.juniorsCollection.doc(id).update(Object.assign({}, shadowJ));
+                this.juniorsCollection.doc(id).update(Object.assign({}, shadowJ)).then(_ => this.isFirst = false);
                 index++;
               });
               index = 0;
             });
-            // .doc(this.juniorsCollection).update(Object.assign({}, junior));
-            // (ref) => ref.forEach(doc => {
-            //                 this.juniorsCollection.doc(doc.id).update(Object.assign({}, junior));
-            //               })
           }),
         ).subscribe();
       }),
     ).subscribe();
+
+    // this.isFirst = false;
   }
 }
