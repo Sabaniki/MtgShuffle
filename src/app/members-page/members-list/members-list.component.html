@@ -4,15 +4,24 @@
     <li class="list-group-item dark-back" *ngFor="let member of (members | async)">
       <div>
         {{member.name}}
-        <button class="btn btn-info float-right">absent...</button>
+        <button *ngIf="editMode; else elseBlockAbsent" class="btn btn-danger float-right">remove</button>
+        <ng-template #elseBlockAbsent>
+          <button class="btn btn-info float-right">absent</button>
+        </ng-template>
       </div>
     </li>
     <div>
       <div class="container">
         <div class="row">
-          <div class="col-md-4"></div>
-          <button class="btn bg-white col-md-4">edit member...</button>
-          <div class="col-md-4"></div>
+          <button class="btn bg-warning col-md-3" *ngIf="editMode; else elseAddMember">+</button>
+          <ng-template #elseAddMember>
+            <div class="col-md-3" ></div>
+          </ng-template>
+          <button class="btn bg-white col-md-6" (click)="editMode = !editMode">
+            <div *ngIf="editMode; else elseBlockEnterEditMode">finish edit</div>
+            <ng-template #elseBlockEnterEditMode>edit member...</ng-template>
+          </button>
+          <div class="col-md-1"></div>
         </div>
       </div>
     </div>

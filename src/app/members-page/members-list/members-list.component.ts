@@ -11,15 +11,19 @@ import {Observable} from 'rxjs';
 export class MembersListComponent implements OnInit {
   private membersCollection: AngularFirestoreCollection<Member>;
   public members: Observable<Member[]>;
+  public editMode: boolean;
 
   @Input() listName: string;
 
   constructor(private afs: AngularFirestore) {
   }
 
+
+
   ngOnInit(): void {
     this.membersCollection = this.afs.collection<Member>(this.listName);
     this.members = this.membersCollection.valueChanges();
+    this.editMode = false;
   }
 
 }
