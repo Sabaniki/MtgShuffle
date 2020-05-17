@@ -1,6 +1,6 @@
 <div class="card dark-back mb-5">
 <!--  <h2>{{listName}}</h2>-->
-  <h3>{{(leaders | async)[groupId].name}}'s group</h3>
+  <h3 class="m-auto">{{(leaders | async)[groupId].name}}'s group</h3>
   <ul class="list-group">
     <ng-container  *ngFor="let member of (members | async)">
       <li class="list-group-item dark-back" *ngIf="member.groupId == groupId">

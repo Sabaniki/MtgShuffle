@@ -1,10 +1,10 @@
 <div class="card dark-back mb-5">
-  <h2>{{listName}}</h2>
+  <h2 class="m-auto">{{listName}}</h2>
   <ul class="list-group">
     <li class="list-group-item dark-back" *ngFor="let member of (members | async)">
       <div>
         {{member.name}}
-        <button class="btn btn-info float-right">-</button>
+        <button class="btn btn-info float-right">absent...</button>
       </div>
     </li>
     <div>
