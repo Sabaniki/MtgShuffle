@@ -1,9 +1,13 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {AngularFirestore, AngularFirestoreCollection, DocumentChangeAction} from '@angular/fire/firestore';
+import {AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument, DocumentChangeAction} from '@angular/fire/firestore';
 import {Member} from '../../shared/interfaces/member';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {Router} from '@angular/router';
-import {tap} from 'rxjs/operators';
+import {map, tap} from 'rxjs/operators';
+import {ResetHistory} from '../../shared/interfaces/reset-history';
+import Timestamp = firebase.firestore.Timestamp;
+import * as firebase from 'firebase';
+
 
 @Component({
   selector: 'app-group-page',
@@ -13,13 +17,15 @@ import {tap} from 'rxjs/operators';
 export class GroupPageComponent implements OnInit, OnDestroy {
   private seniorsCollection: AngularFirestoreCollection<Member>;
   public seniors: Observable<Member[]>;
-  private seniorsSnapshot: Observable<DocumentChangeAction<Member>[]>;
 
   private juniorsCollection: AngularFirestoreCollection<Member>;
   public juniors: Observable<Member[]>;
-  private juniorsSnapshot: Observable<DocumentChangeAction<Member>[]>;
 
-  public isFirst;
+  private resetHistoryCollection: AngularFirestoreCollection<ResetHistory>;
+  public resetHistory: Observable<ResetHistory>;
+
+  public isFirst: boolean;
+  public isTodayAlreadyReset: boolean;
 
   @Input() listName: string;
 
@@ -36,11 +42,19 @@ export class GroupPageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.seniorsCollection = this.afs.collection<Member>('Seniors');
     this.seniors = this.seniorsCollection.valueChanges();
-    this.seniorsSnapshot = this.seniorsCollection.snapshotChanges();
 
     this.juniorsCollection = this.afs.collection<Member>('Juniors');
     this.juniors = this.juniorsCollection.valueChanges();
-    this.juniorsSnapshot = this.juniorsCollection.snapshotChanges();
+
+    this.resetHistoryCollection = this.afs.collection<ResetHistory>('ResetHistory');
+    this.resetHistory = this.resetHistoryCollection.doc<ResetHistory>('reset_history').valueChanges();
+
+    this.isTodayAlreadyReset = false;
+
+    this.resetHistory.subscribe(hist => {
+      this.isTodayAlreadyReset = hist.lastUpdate.toDate().toDateString() === new Date().toDateString();
+      console.log(this.isTodayAlreadyReset);
+    });
 
     this.isFirst = true;
 
@@ -68,10 +82,11 @@ export class GroupPageComponent implements OnInit, OnDestroy {
     // let sumOfSeniors = 0;
     // let sumOfJuniors = 0;
     let flatGroupIds: number[];
+    console.log(this.isTodayAlreadyReset);
 
     this.juniors.pipe(
       tap(juniors => {
-        if (!this.isFirst) {
+        if (!this.isFirst || this.isTodayAlreadyReset) {
           return;
         }
         this.isFirst = false;
@@ -119,7 +134,7 @@ export class GroupPageComponent implements OnInit, OnDestroy {
               docIds.forEach(id => {
                 const shadowJ = juniors[index];
                 shadowJ.groupId = flatGroupIds[index];
-                this.juniorsCollection.doc(id).update(Object.assign({}, shadowJ)).then(_ => this.isFirst = false);
+                this.juniorsCollection.doc(id).update(Object.assign({}, shadowJ)).then(__ => this.isFirst = false);
                 index++;
               });
               index = 0;
@@ -128,6 +143,10 @@ export class GroupPageComponent implements OnInit, OnDestroy {
         ).subscribe();
       }),
     ).subscribe();
+
+    this.resetHistoryCollection.doc('reset_history')
+      .update(Object.assign({}, {lastUpdate: new Date()}))
+      .then(__ => console.log('updated reset hist'));
 
     // this.isFirst = false;
   }

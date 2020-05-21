@@ -1,8 +1,11 @@
 <div class="container-fluid">
   <div class="row">
     <button class="col-md-4 btn btn-lg bg-white m-2" (click)="onClickGoMembersButton()"><-- Members</button>
-    <button class="col-md-4 btn btn-lg bg-white m-2" (click)="resetGroup()" [disabled]="!isFirst">! Reset Groups !</button>
-    <div class="col-md-4"></div>
+    <button class="col-md-4 btn btn-lg bg-white m-2" (click)="resetGroup()" [hidden]="isTodayAlreadyReset" [disabled]="isTodayAlreadyReset || !isFirst">
+      ! Reset Groups !
+    </button>
+    <h3 *ngIf="isTodayAlreadyReset" class="text-danger col-md-4 m-2"> Today, already reset... </h3>
+
   </div>
   <div class="row">
     <ng-container *ngFor="let order of arrayNumberLength(sumOfSeniors); index as i;">
